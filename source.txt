@@ -1,0 +1,1275 @@
+--- hash.h ---
+
+#ifndef _HASH_TABLE_H_
+#define _HASH_TABLE_H_
+
+#include "vector.h"
+
+
+typedef struct HashTable HashTable;
+
+typedef int (*HashFunction)(HashTable *h, void *);
+typedef int (*CmpFunction)(void *k1, void *k2);
+
+typedef struct
+{
+    void *key;
+    void *val;
+} HashTableItem;
+
+typedef struct HashTableIterator HashTableIterator;
+
+// constroi a hash
+HashTable *hash_table_construct(int table_size, HashFunction hash_fn, CmpFunction cmp_fn);
+
+// funcao para insercao/atualizacao de pares chave-valor em O(1).
+// Se a chave ja existir, atualiza o valor e retorna o valor antigo para permitir desalocacao.
+void *hash_table_set(HashTable *h, void *key, void *val);
+
+// retorna o valor associado com a chave key ou NULL se ela nao existir em O(1).
+void *hash_table_get(HashTable *h, void *key);
+
+// remove o par chave-valor e retorna o valor ou NULL se nao existir tal chave em O(1).
+void *hash_table_pop(HashTable *h, void *key);
+
+// numero de buckets
+int hash_table_size(HashTable *h);
+
+// numero de elementos inseridos
+int hash_table_num_elems(HashTable *h);
+
+// libera o espaco alocado para a tabela hash
+void hash_table_destroy(HashTable *h);
+
+// cria um novo iterador para a tabela hash
+HashTableIterator *hash_table_iterator(HashTable *h);
+
+// retorna 1 se o iterador chegou ao fim da tabela hash ou 0 caso contrario
+int hash_table_iterator_is_over(HashTableIterator *it);
+
+// retorna o proximo par chave valor da tabela hash
+HashTableItem *hash_table_iterator_next(HashTableIterator *it);
+
+// desaloca o iterador da tabela hash
+void hash_table_iterator_destroy(HashTableIterator *it);
+
+Vector *hash_to_vector(HashTable *h);
+
+#endif
+--- binary_tree.c ---
+#include "binary_tree.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "vector.h"
+
+typedef struct Node
+{
+	KeyValPair *kvp;
+	struct Node *left;
+	struct Node *right;
+} Node;
+
+struct BinaryTree
+{
+	Node *root;
+	CmpFn cmp_fn;
+	KeyDestroyFn key_destroy_fn;
+	ValDestroyFn val_destroy_fn;
+};
+
+void key_val_pair_destroy(KeyValPair *kvp)
+{
+	free(kvp);
+}
+
+BinaryTree *binary_tree_construct(
+	CmpFn cmp_fn, KeyDestroyFn key_destroy_fn,
+	ValDestroyFn val_destroy_fn)
+{
+	BinaryTree *bt = malloc(sizeof(BinaryTree));
+	bt->root = NULL;
+	bt->cmp_fn = cmp_fn;
+	bt->key_destroy_fn = key_destroy_fn;
+	bt->val_destroy_fn = val_destroy_fn;
+	return bt;
+}
+
+Node *node_construct(KeyValPair *kvp, Node *left, Node *right)
+{
+	Node *new_node = malloc(sizeof(Node));
+	new_node->kvp = kvp;
+	new_node->left = left;
+	new_node->right = right;
+	return new_node;
+}
+
+Node *_add_recursive(Node *node, KeyValPair *kvp, CmpFn cmp_fn)
+{
+	if (node == NULL)
+	{
+		return node_construct(kvp, NULL, NULL);
+	}
+
+	int cmp = cmp_fn(kvp->key, node->kvp->key);
+	// printf("comparando %f com %f | resultado %d\n", *(float *)kvp->key, *(float *)node->kvp->key, cmp);
+	if (cmp < 0)
+	{
+		node->left = _add_recursive(node->left, kvp, cmp_fn);
+	}
+	else if (cmp > 0)
+	{
+		node->right = _add_recursive(node->right, kvp, cmp_fn);
+	}
+
+	return node;
+}
+
+KeyValPair *key_val_pair_construct(void *key, void *value)
+{
+	KeyValPair *kv = malloc(sizeof(KeyValPair));
+	kv->key = key;
+	kv->value = value;
+
+	return kv;
+}
+
+void binary_tree_add(BinaryTree *bt, void *key, void *value)
+{
+	bt->root = _add_recursive(bt->root, key_val_pair_construct(key, value), bt->cmp_fn);
+}
+
+void *_get_recursive(Node *node, void *key, CmpFn cmp_fn)
+{
+	if (node == NULL)
+	{
+		return NULL;
+	}
+
+	int cmp = cmp_fn(key, node->kvp->key);
+	if (cmp == 0)
+	{
+		return node->kvp->value;
+	}
+	else if (cmp < 0)
+	{
+		return _get_recursive(node->left, key, cmp_fn);
+	}
+	else
+	{
+		return _get_recursive(node->right, key, cmp_fn);
+	}
+
+	// return NULL;
+}
+
+void *binary_tree_get(BinaryTree *bt, void *key)
+{
+	if (bt == NULL || bt->root == NULL || key == NULL)
+	{
+		// Verifica se a árvore ou a chave são válidas
+		return NULL;
+	}
+	return _get_recursive(bt->root, key, bt->cmp_fn);
+}
+
+void binary_tree_remove(BinaryTree *bt, void *key)
+{
+	Node *actual = bt->root;
+	Node *parent = NULL;
+
+	// 1. Find the node to remove and its parent
+	while (actual != NULL && bt->cmp_fn(key, actual->kvp->key) != 0)
+	{
+		parent = actual;
+		if (bt->cmp_fn(key, actual->kvp->key) < 0)
+		{
+			actual = actual->left;
+		}
+		else
+		{
+			actual = actual->right;
+		}
+	}
+
+	if (actual == NULL)
+	{
+		return;
+	}
+
+	// 2. Case 1: Node is a leaf (no children)
+	if (actual->left == NULL && actual->right == NULL)
+	{
+		printf("caso 1");
+		if (parent == NULL)
+		{
+			bt->root = NULL;
+		}
+		else if (parent->left == actual)
+		{
+			parent->left = NULL;
+		}
+		else
+		{
+			parent->right = NULL;
+		}
+
+		// Free the node and its KeyValPair
+		// bt->key_destroy_fn(actual->kvp->key);
+		// bt->val_destroy_fn(actual->kvp->value);
+		// key_val_pair_destroy(actual->kvp);
+		// free(actual);
+	}
+	// 3. Case 2: Node has only a right child
+	else if (actual->left == NULL)
+	{
+		printf("caso 2");
+		if (parent == NULL)
+		{
+			bt->root = actual->right;
+		}
+		else if (parent->left == actual)
+		{
+			parent->left = actual->right;
+		}
+		else
+		{
+			parent->right = actual->right;
+		}
+
+		// // Free the node and its KeyValPair
+		// bt->key_destroy_fn(actual->kvp->key);
+		// bt->val_destroy_fn(actual->kvp->value);
+		// key_val_pair_destroy(actual->kvp);
+		// free(actual);
+	}
+	// 4. Case 2: Node has only a left child
+	else if (actual->right == NULL)
+	{
+		printf("caso 3");
+		if (parent == NULL)
+		{
+			bt->root = actual->left;
+		}
+		else if (parent->left == actual)
+		{
+			parent->left = actual->left;
+		}
+		else
+		{
+			parent->right = actual->left;
+		}
+
+		// 	// Free the node and its KeyValPair
+		// 	bt->key_destroy_fn(actual->kvp->key);
+		// 	bt->val_destroy_fn(actual->kvp->value);
+		// 	key_val_pair_destroy(actual->kvp);
+		// 	free(actual);
+	}
+	// 5. Caso 3: Nó tem dois filhos
+	else
+	{
+		printf("caso 4");
+		// Encontrar o sucessor in-order (menor nó da subárvore direita)
+		Node *successor_parent = actual;
+		Node *successor = actual->right;
+
+		while (successor->left != NULL)
+		{
+			successor_parent = successor;
+			successor = successor->left;
+		}
+
+		// Substituir a chave e valor do nó a ser removido
+		KeyValPair *old_kvp = actual->kvp;
+		actual->kvp = successor->kvp;
+
+		// Remover o sucessor (que terá no máximo um filho à direita)
+		if (successor_parent->left == successor)
+		{
+			successor_parent->left = successor->right;
+		}
+		else
+		{
+			successor_parent->right = successor->right;
+		}
+
+		// // Liberar a memória do KeyValPair antigo
+		// bt->key_destroy_fn(old_kvp->key);
+		// bt->val_destroy_fn(old_kvp->value);
+		// key_val_pair_destroy(old_kvp);
+
+		// // Liberar o nó sucessor
+		// free(successor);
+	}
+}
+
+KeyValPair *binary_tree_pop_min(BinaryTree *bt)
+{
+	if (bt == NULL || bt->root == NULL)
+		return NULL;
+
+	Node *current = bt->root;
+
+	// Find the leftmost node (min)
+	while (current->left != NULL)
+	{
+		current = current->left;
+	}
+
+	KeyValPair *kvp = current->kvp;
+
+	// // Adjust parent links
+	// if (parent == NULL)
+	// {
+	// 	// The root is the minimum node
+	// 	bt->root = current->right;
+	// }
+	// else
+	// {
+	// 	parent->left = current->right;
+	// }
+
+	// free(current); // Free the node but not the KeyValPair
+	return kvp;
+}
+
+KeyValPair *binary_tree_pop_max(BinaryTree *bt)
+{
+	if (bt == NULL || bt->root == NULL)
+		return NULL;
+
+	Node *current = bt->root;
+
+	// Find the rightmost node (max)
+	while (current->right != NULL)
+	{
+		current = current->right;
+	}
+
+	KeyValPair *kvp = current->kvp;
+
+	// // Adjust parent links
+	// if (parent == NULL)
+	// {
+	// 	// The root is the maximum node
+	// 	bt->root = current->left;
+	// }
+	// else
+	// {
+	// 	parent->right = current->left;
+	// }
+
+	// free(current); // Free the node but not the KeyValPair
+	return kvp;
+}
+
+void _inorder(Node *node, Vector *v)
+{
+	if (node == NULL)
+	{
+		return;
+	}
+	_inorder(node->left, v);
+	vector_push_back(v, node->kvp);
+	_inorder(node->right, v);
+}
+
+Vector *binary_tree_inorder_traversal_recursive(BinaryTree *bt)
+{
+
+	Vector *v1 = vector_construct();
+	_inorder(bt->root, v1);
+
+	return v1;
+}
+
+void _preorder(Node *node, Vector *v)
+{
+	if (node == NULL)
+	{
+		return;
+	}
+	vector_push_back(v, node->kvp);
+	_preorder(node->left, v);
+	_preorder(node->right, v);
+}
+
+Vector *binary_tree_preorder_traversal_recursive(BinaryTree *bt)
+{
+
+	Vector *v2 = vector_construct();
+	_preorder(bt->root, v2);
+
+	return v2;
+}
+
+void _postorder(Node *node, Vector *v)
+{
+	if (node == NULL)
+	{
+		return;
+	}
+	_postorder(node->left, v);
+	_postorder(node->right, v);
+	vector_push_back(v, node->kvp);
+}
+
+Vector *binary_tree_postorder_traversal_recursive(BinaryTree *bt)
+{
+	Vector *v3 = vector_construct();
+	_postorder(bt->root, v3);
+
+	return v3;
+}
+
+static void _node_destroy(Node *node, KeyDestroyFn key_destroy_fn, ValDestroyFn val_destroy_fn)
+{
+	if (node == NULL)
+	{
+		return;
+	}
+	_node_destroy(node->left, key_destroy_fn, val_destroy_fn);
+	_node_destroy(node->right, key_destroy_fn, val_destroy_fn);
+
+	// Destruir o KeyValPair do nó
+	key_destroy_fn(node->kvp->key);
+	val_destroy_fn(node->kvp->value);
+	free(node->kvp);
+
+	// Liberar o nó em si
+	free(node);
+}
+
+Node *_search_recursive(Node *node, void *min_key, void *max_key, Vector *v, CmpFn cmp_fn)
+{
+
+	if (node == NULL)
+	{
+		return NULL;
+	}
+
+	_search_recursive(node->left, min_key, max_key, v, cmp_fn);
+
+	if (cmp_fn(node->kvp->key, min_key) >= 0 && cmp_fn(node->kvp->key, max_key) <= 0)
+	{
+		vector_push_back(v, node->kvp->value);
+	}
+	_search_recursive(node->right, min_key, max_key, v, cmp_fn);
+
+	return NULL;
+}
+
+Vector *binary_tree_interval(BinaryTree *bt, void *min_key, void *max_key)
+{
+
+	Vector *v = vector_construct();
+	Node *node = bt->root;
+
+	_search_recursive(node, min_key, max_key, v, bt->cmp_fn);
+	return v;
+}
+
+void binary_tree_destroy(BinaryTree *bt)
+{
+	if (bt == NULL)
+	{
+		return;
+	}
+	_node_destroy(bt->root, bt->key_destroy_fn, bt->val_destroy_fn);
+	free(bt);
+}
+--- binary_tree.h ---
+
+#ifndef _BINARY_TREE_H_
+#define _BINARY_TREE_H_
+
+#include "vector.h"
+
+typedef struct
+{
+	void *key;
+	void *value;
+} KeyValPair;
+
+KeyValPair *key_val_pair_construct(void *key, void *val);
+void key_val_pair_destroy(KeyValPair *kvp);
+
+typedef int (*CmpFn)(void *, void *);
+typedef void (*KeyDestroyFn)(void *);
+typedef void (*ValDestroyFn)(void *);
+
+typedef struct BinaryTree BinaryTree;
+
+BinaryTree *binary_tree_construct(
+	CmpFn cmp_fn, KeyDestroyFn key_destroy_fn,
+	ValDestroyFn val_destroy_fn);
+void binary_tree_add(BinaryTree *bt, void *key, void *value);
+// void binary_tree_add_recursive(BinaryTree *bt, void *key, void *value);
+// int binary_tree_empty(BinaryTree *bt);
+void binary_tree_remove(BinaryTree *bt, void *key);
+KeyValPair *binary_tree_min(BinaryTree *bt);
+KeyValPair *binary_tree_max(BinaryTree *bt);
+KeyValPair *binary_tree_pop_min(BinaryTree *bt);
+KeyValPair *binary_tree_pop_max(BinaryTree *bt);
+Vector *binary_tree_interval(BinaryTree *bt, void *min_key, void *max_key);
+void *binary_tree_get(BinaryTree *bt, void *key);
+void binary_tree_destroy(BinaryTree *bt);
+
+Vector *binary_tree_inorder_traversal_recursive(BinaryTree *bt);
+Vector *binary_tree_preorder_traversal_recursive(BinaryTree *bt);
+Vector *binary_tree_postorder_traversal_recursive(BinaryTree *bt);
+
+#endif
+--- main.h ---
+#pragma once
+void print_values(HashTable *hash, BinaryTree *tree);
+
+--- vector.c ---
+#include "vector.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "hash.h"
+
+// Cria um vetor vazio
+Vector *vector_construct()
+{
+	Vector *v = (Vector *)calloc(1, sizeof(Vector));
+	v->data = NULL;
+	v->size = 0;
+	v->allocated = 0;
+	return v;
+}
+
+// Adiciona um elemento ao final do vetor
+void vector_push_back(Vector *v, void *val)
+{
+	// Se o vetor estiver cheio, realoca mais memória
+	if (v->size == v->allocated)
+	{
+		v->allocated = (v->allocated == 0) ? 1 : v->allocated * 2;
+		v->data = realloc(v->data, v->allocated * sizeof(void *));
+	}
+
+	// Adiciona o novo elemento
+	v->data[v->size] = val;
+	v->size++;
+}
+
+// Retorna o elemento na posição i
+void *vector_get(Vector *v, int i)
+{
+	if (i < 0 || i >= v->size)
+	{
+		printf("Erro: Índice fora dos limites do vetor.\n");
+		exit(1);
+	}
+	return v->data[i];
+}
+
+// Define o valor na posição i
+void vector_set(Vector *v, int i, void *val)
+{
+	if (i < 0 || i >= v->size)
+	{
+		printf("Erro: Índice fora dos limites do vetor.\n");
+		exit(1);
+	}
+	v->data[i] = val;
+}
+
+// Retorna o tamanho do vetor
+int vector_size(Vector *v)
+{
+	return v->size;
+}
+
+// Encontra o índice de um valor no vetor (retorna -1 se não encontrar)
+int vector_find(Vector *v, void *val)
+{
+	for (int i = 0; i < v->size; i++)
+	{
+		if (v->data[i] == val)
+		{
+			return i;
+		}
+	}
+	return -1;
+}
+
+// Retorna o maior elemento do vetor (assumindo que podemos comparar elementos usando o operador "<")
+void *vector_max(Vector *v)
+{
+	if (v->size == 0)
+	{
+		printf("Erro: Vetor vazio.\n");
+		exit(1);
+	}
+
+	void *max = v->data[0];
+	for (int i = 1; i < v->size; i++)
+	{
+		if (v->data[i] > max)
+		{
+			max = v->data[i];
+		}
+	}
+	return max;
+}
+
+// Retorna o menor elemento do vetor (assumindo que podemos comparar elementos usando o operador "<")
+void *vector_min(Vector *v)
+{
+	if (v->size == 0)
+	{
+		printf("Erro: Vetor vazio.\n");
+		exit(1);
+	}
+
+	void *min = v->data[0];
+	for (int i = 1; i < v->size; i++)
+	{
+		if (v->data[i] < min)
+		{
+			min = v->data[i];
+		}
+	}
+	return min;
+}
+
+// Retorna o índice do maior elemento do vetor (assumindo que podemos comparar elementos usando o operador "<")
+int vector_argmax(Vector *v)
+{
+	if (v->size == 0)
+	{
+		printf("Erro: Vetor vazio.\n");
+		exit(1);
+	}
+
+	int argmax = 0;
+	for (int i = 1; i < v->size; i++)
+	{
+		if (v->data[i] > v->data[argmax])
+		{
+			argmax = i;
+		}
+	}
+	return argmax;
+}
+
+// Retorna o índice do menor elemento do vetor (assumindo que podemos comparar elementos usando o operador "<")
+int vector_argmin(Vector *v)
+{
+	if (v->size == 0)
+	{
+		printf("Erro: Vetor vazio.\n");
+		exit(1);
+	}
+
+	int argmin = 0;
+	for (int i = 1; i < v->size; i++)
+	{
+		if (v->data[i] < v->data[argmin])
+		{
+			argmin = i;
+		}
+	}
+	return argmin;
+}
+
+void *vector_pop_back(Vector *v)
+{
+	if (v->size == 0)
+	{
+		printf("Erro: Vetor vazio.\n");
+		exit(1);
+	}
+	void *val = v->data[v->size - 1];
+	v->size--;
+	return val;
+}
+
+void vector_sort(Vector *v, int (*cmp)(void *, void *))
+{
+	for (int i = 0; i < v->size - 1; i++)
+	{
+		for (int j = i + 1; j < v->size; j++)
+		{
+
+			if (cmp(v->data[i], v->data[j]) > 0)
+			{
+				void *aux = v->data[i];
+				v->data[i] = v->data[j];
+				v->data[j] = aux;
+			}
+		}
+	}
+}
+// Libera a memória alocada para o vetor
+void vector_destroy(Vector *v)
+{
+	free(v->data);
+	free(v);
+}
+--- vector.h ---
+
+#ifndef _DATA_STRUCTURES_VECTOR_H_
+#define _DATA_STRUCTURES_VECTOR_H_
+
+typedef struct
+{
+    void **data;
+    int size;
+    int allocated;
+} Vector;
+
+Vector *vector_construct();
+
+void vector_push_back(Vector *v, void* val);
+
+void* vector_get(Vector *v, int i);
+void vector_set(Vector *v, int i, void* val);
+int vector_size(Vector *v);
+
+int vector_find(Vector *v, void* val);
+
+// Retorna o maior elemento do vector (assumindo que podemos comparar elementos usando o operador "<")
+void* vector_max(Vector *v);
+
+// Retorna o menor elemento do vector (assumindo que podemos comparar elementos usando o operador "<")
+void* vector_min(Vector *v);
+
+// Retorna o índice do maior elemento do vector (assumindo que podemos comparar elementos usando o operador "<")
+int vector_argmax(Vector *v);
+
+// Retorna o índice do menor elemento do vector (assumindo que podemos comparar elementos usando o operador "<")
+int vector_argmin(Vector *v);
+
+void* vector_pop_back(Vector *v);
+
+void vector_destroy(Vector *v);
+
+// vector sort
+void vector_sort(Vector *v, int (*cmp)(void*, void*));
+#endif
+
+--- main.c ---
+#include <stdlib.h>
+#include <stdio.h>
+#include "hash.h"
+#include "binary_tree.h"
+#include <string.h>
+
+typedef struct Empresa
+{
+	char nome[100];
+	char sigla[32];
+	float valorUnitario;
+	int totalAcoes;
+	int acoesVendidas;
+} Empresa;
+
+int hash_str(HashTable *h, void *data)
+{
+	char *str = (char *)data;
+
+	long hash_val = 0;
+	int base = 127;
+
+	for (size_t i = 0; i < strlen(str); i++)
+		hash_val = (base * hash_val + str[i]) % hash_table_size(h);
+
+	return hash_val;
+}
+
+int cmp_str(void *a, void *b)
+{
+	return strcmp((char *)a, (char *)b);
+}
+
+int cmp_empresa(void *a, void *b)
+{
+	Empresa *empresaA = (Empresa *)a;
+	Empresa *empresaB = (Empresa *)b;
+
+	if ((empresaA->valorUnitario) < (empresaB->valorUnitario))
+		return -1;
+	if ((empresaA->valorUnitario) > (empresaB->valorUnitario))
+		return 1;
+	return strcmp(empresaA->sigla, empresaB->sigla);
+}
+
+int cmp_chave(void *a, void *b)
+{
+	float chaveA = *(float *)a;
+	float chaveB = *(float *)b;
+	if (chaveA > chaveB)
+		return 1;
+	else if (chaveA < chaveB)
+		return -1;
+	else
+		return 0;
+}
+
+void key_destroy_fn(void *key)
+{
+	free(key);
+}
+
+void val_destroy_fn(void *val)
+{
+	Empresa *e = (Empresa *)val;
+	if (e == NULL)
+	{
+		return;
+	}
+
+	free(e);
+}
+
+Empresa *empresa_construct(char *nome, char *sigla, float valorUnitario, int totalAcoes, int acoesVendidas)
+{
+	Empresa *empresa = malloc(sizeof(Empresa));
+	strcpy(empresa->nome, nome);
+	strcpy(empresa->sigla, sigla);
+	empresa->valorUnitario = valorUnitario;
+	empresa->totalAcoes = totalAcoes;
+	empresa->acoesVendidas = acoesVendidas;
+	return empresa;
+}
+
+void empresa_destroy(void *empresa)
+{
+	Empresa *e = (Empresa *)empresa;
+	free(e);
+}
+
+void print_values(HashTable *hash, BinaryTree *tree)
+{
+	Vector *v_hash = hash_to_vector(hash);
+	printf("Hash: ");
+	for (int i = 0; i < vector_size(v_hash); i++)
+	{
+		HashTableItem *item = (HashTableItem *)vector_get(v_hash, i);
+
+		Empresa *empresa = (Empresa *)item->val;
+
+		printf("%s %s %.2f %d %d\n", empresa->nome, empresa->sigla, empresa->valorUnitario, empresa->totalAcoes, empresa->acoesVendidas);
+	}
+
+	// TREE
+
+	Vector *v = binary_tree_inorder_traversal_recursive(tree);
+	printf("InOrder recursivo: ");
+	for (int i = 0; i < vector_size(v); i++)
+	{
+		KeyValPair *kvp = vector_get(v, i);
+		Empresa *empresa = (Empresa *)kvp->value;
+		printf("%s %s %.2f %d %d\n", empresa->nome, empresa->sigla, empresa->valorUnitario, empresa->totalAcoes, empresa->acoesVendidas);
+	}
+	printf("\n");
+}
+
+int main()
+{
+
+	char arquivo[100];
+	HashTable *hash = hash_table_construct(100, hash_str, cmp_str);
+	BinaryTree *tree = binary_tree_construct(cmp_chave, key_destroy_fn, val_destroy_fn);
+
+	scanf("%s", arquivo);
+
+	FILE *arq = fopen(arquivo, "r");
+	if (arq == NULL)
+	{
+		printf("Erro ao abrir o arquivo\n");
+		return 1;
+	}
+
+	int i = 0, n = 1;
+
+	fscanf(arq, "%d", &n);
+
+	while (i < n)
+	{
+
+		char nome[100];
+		char sigla[32];
+		float valorUnitario;
+		int totalAcoes;
+		int acoesVendidas;
+		fscanf(arq, "%s %s %f %d %d", nome, sigla, &valorUnitario, &totalAcoes, &acoesVendidas);
+
+		valorUnitario = valorUnitario * 100 / 100;
+
+		Empresa *empresa = empresa_construct(nome, sigla, valorUnitario, totalAcoes, acoesVendidas);
+
+		Empresa *empresa_antiga = hash_table_set(hash, empresa->sigla, empresa);
+		if (empresa_antiga != NULL)
+		{
+			free(empresa_antiga);
+		}
+		float *valorKey = malloc(sizeof(float));
+		*valorKey = empresa->valorUnitario;
+		binary_tree_add(tree, valorKey, empresa);
+		i++;
+	}
+
+	fclose(arq);
+
+	// print_values(hash, tree);
+
+	int m;
+	scanf("%d", &m);
+
+	for (int i = 0; i < m; i++)
+	{
+		char operacao[32];
+		scanf("%s", operacao);
+
+		if (strcmp(operacao, "UPDATE") == 0)
+		{
+
+			char sigla[32];
+			float valor;
+
+			scanf("%s", sigla);
+
+			scanf("%f", &valor);
+
+			Empresa *empresa = hash_table_get(hash, sigla);
+
+			if (empresa == NULL)
+			{
+				printf("Empresa nao encontrada\n");
+			}
+			else
+			{
+				Empresa *nova_empresa_ht = empresa_construct(empresa->nome, empresa->sigla, valor, empresa->totalAcoes, empresa->acoesVendidas);
+				float valorAntigo = empresa->valorUnitario;
+				Empresa *empresa_antiga = hash_table_set(hash, sigla, nova_empresa_ht);
+
+				binary_tree_remove(tree, &valorAntigo);
+				binary_tree_add(tree, &valor, nova_empresa_ht);
+				// empresa_destroy(empresa);
+			}
+		}
+
+		else if (strcmp(operacao, "GET") == 0)
+		{
+
+			char sigla[32];
+			scanf("%s", sigla);
+
+			Empresa *empresa = hash_table_get(hash, sigla);
+
+			if (empresa == NULL)
+			{
+				printf("Empresa nao encontrada\n");
+			}
+			else
+			{
+
+				printf("%s %s %.2f %d %d\n", empresa->nome, empresa->sigla, empresa->valorUnitario, empresa->totalAcoes, empresa->acoesVendidas);
+			}
+		}
+		else if (strcmp(operacao, "RM") == 0)
+		{
+
+			char sigla[32];
+			scanf("%s", sigla);
+
+			Empresa *empresa = hash_table_pop(hash, sigla);
+
+			if (empresa == NULL)
+			{
+				printf("Empresa nao encontrada\n");
+			}
+			else
+			{
+				empresa_destroy(empresa);
+			}
+
+			printf("removi do hash");
+
+			// remover da arvore
+			float *valor_key = malloc(sizeof(float));
+			*valor_key = empresa->valorUnitario;
+
+			binary_tree_remove(tree, valor_key);
+			printf("removei da arvore\n");
+		}
+		else if (strcmp(operacao, "INTERVAL") == 0)
+		{
+
+			float min, max;
+			scanf("%f", &min);
+
+			scanf("%f", &max);
+
+			Vector *interval = binary_tree_interval(tree, &min, &max); // vetor de empresas
+
+			for (int i = 0; i < vector_size(interval); i++)
+			{
+				Empresa *empresa = vector_get(interval, i);
+				printf("%s\n", empresa->sigla);
+			}
+
+			vector_destroy(interval);
+		}
+		else if (strcmp(operacao, "MIN") == 0)
+		{
+
+			KeyValPair *kvp_min = binary_tree_pop_min(tree);
+			Empresa *empresa = (Empresa *)kvp_min->value;
+
+			printf("%s\n", empresa->sigla);
+
+			// free(kvp_min);
+		}
+		else if (strcmp(operacao, "MAX") == 0)
+		{
+
+			KeyValPair *kvp_max = binary_tree_pop_max(tree);
+			Empresa *empresa = (Empresa *)kvp_max->value;
+
+			printf("%s\n", empresa->sigla);
+
+			// free(kvp_max);
+		}
+		else if (strcmp(operacao, "SORTED") == 0)
+		{
+
+			Vector *v = binary_tree_inorder_traversal_recursive(tree);
+			// vector_sort(v, cmp_empresa);
+
+			for (int i = 0; i < vector_size(v); i++)
+			{
+				KeyValPair *kvp = vector_get(v, i);
+				Empresa *empresa = (Empresa *)kvp->value;
+				printf("%s %.2f\n", empresa->sigla, empresa->valorUnitario);
+			}
+
+			vector_destroy(v);
+		}
+	}
+
+	// PRINT
+
+	// HASH
+
+	print_values(hash, tree);
+
+	hash_table_destroy(hash);
+	binary_tree_destroy(tree);
+
+	return 0;
+}
+
+--- hash.c ---
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "hash.h"
+
+typedef struct HashNode
+{
+	HashTableItem item;
+	struct HashNode *next;
+} HashNode;
+
+struct HashTable
+{
+	HashNode **buckets;
+	int table_size;
+	int num_elems;
+	HashFunction hash_fn;
+	CmpFunction cmp_fn;
+};
+
+typedef struct HashTableIterator
+{
+	HashTable *hash_table;	// Tabela hash a ser iterada
+	int bucket_index;		// Índice do bucket atual
+	HashNode *current_node; // Nó atual na lista encadeada
+	int current_element;	// Elemento atual (contador)
+} HashTableIterator;
+
+HashTable *hash_table_construct(int table_size, HashFunction hash_fn, CmpFunction cmp_fn)
+{
+	HashTable *hash_tbl = calloc(1, sizeof(HashTable));
+
+	hash_tbl->table_size = table_size;
+	hash_tbl->num_elems = 0;
+	hash_tbl->hash_fn = hash_fn;
+	hash_tbl->cmp_fn = cmp_fn;
+	hash_tbl->buckets = calloc(table_size, sizeof(HashNode *));
+
+	return hash_tbl;
+}
+
+// Inserção na tabela hash
+void *hash_table_set(HashTable *h, void *key, void *val)
+{
+	int index = h->hash_fn(h, key) % h->table_size;
+
+	HashNode *node = h->buckets[index];
+	while (node != NULL)
+	{
+		if (h->cmp_fn(node->item.key, key) == 0)
+		{
+			void *old_val = node->item.val;
+			node->item.val = val;
+			return old_val;
+		}
+		node = node->next;
+	}
+
+	HashNode *new_node = calloc(1, sizeof(HashNode));
+	new_node->item.key = key;
+	new_node->item.val = val;
+	new_node->next = h->buckets[index];
+	h->buckets[index] = new_node;
+
+	h->num_elems++;
+	return NULL;
+}
+
+void *hash_table_get(HashTable *h, void *key)
+{
+	int index = h->hash_fn(h, key) % h->table_size;
+
+	HashNode *node = h->buckets[index];
+
+	while (node != NULL)
+	{
+		if (h->cmp_fn(node->item.key, key) == 0)
+		{
+			return node->item.val;
+		}
+		node = node->next;
+	}
+
+	return NULL; // Chave não encontrada
+}
+
+int hash_table_size(HashTable *h)
+{
+
+	return h->table_size;
+}
+
+void *hash_table_pop(HashTable *h, void *key)
+{
+	int index = h->hash_fn(h, key) % h->table_size;
+
+	HashNode *node = h->buckets[index];
+	HashNode *prev = NULL;
+
+	while (node != NULL)
+	{
+		if (h->cmp_fn(node->item.key, key) == 0)
+		{
+			void *val = node->item.val;
+
+			if (prev == NULL)
+			{
+				// O nó a ser removido é o primeiro da lista
+				h->buckets[index] = node->next;
+			}
+			else
+			{
+				// O nó a ser removido está no meio ou no final da lista
+				prev->next = node->next;
+			}
+
+			free(node);
+			h->num_elems--;
+			return val;
+		}
+
+		prev = node;
+		node = node->next;
+	}
+
+	return NULL; // Chave não encontrada
+}
+
+HashTableIterator *hash_table_iterator(HashTable *h)
+{
+	HashTableIterator *iterator = calloc(1, sizeof(HashTableIterator));
+	iterator->hash_table = h;
+	iterator->bucket_index = 0;
+	iterator->current_node = h->buckets[0];
+	iterator->current_element = 0;
+	return iterator;
+}
+
+int hash_table_iterator_is_over(HashTableIterator *it)
+{
+	return it->current_element >= it->hash_table->num_elems;
+}
+
+HashTableItem *hash_table_iterator_next(HashTableIterator *it)
+{
+	// Se o nó atual for nulo, procura o próximo bucket não nulo
+	while (it->current_node == NULL)
+	{
+		it->bucket_index++;
+		if (it->bucket_index >= it->hash_table->table_size)
+		{
+			// Não há mais buckets para iterar
+			return NULL;
+		}
+		it->current_node = it->hash_table->buckets[it->bucket_index];
+	}
+
+	// Retorna um ponteiro para o item atual
+	HashTableItem *item = &(it->current_node->item);
+
+	// Avança para o próximo nó na lista encadeada
+	it->current_node = it->current_node->next;
+
+	// Incrementa o contador de elementos
+	it->current_element++;
+
+	return item;
+}
+
+void hash_table_iterator_destroy(HashTableIterator *it)
+{
+	free(it);
+}
+
+Vector *hash_to_vector(HashTable *h)
+{
+	Vector *v = vector_construct();
+	for (int i = 0; i < h->table_size; i++)
+	{
+		HashNode *node = h->buckets[i];
+		while (node != NULL)
+		{
+			vector_push_back(v, &(node->item));
+			node = node->next;
+		}
+	}
+	return v;
+}
+
+void hash_table_destroy(HashTable *h)
+{
+	for (int i = 0; i < h->table_size; i++)
+	{
+		HashNode *node = h->buckets[i];
+		while (node != NULL)
+		{
+			HashNode *next = node->next; // Salva o próximo nó antes de liberar o atual
+			free(node);
+			node = next;
+		}
+	}
+
+	free(h->buckets);
+	free(h);
+}
