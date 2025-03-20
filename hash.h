@@ -4,7 +4,6 @@
 
 #include "vector.h"
 
-
 typedef struct HashTable HashTable;
 
 typedef int (*HashFunction)(HashTable *h, void *);
@@ -12,8 +11,8 @@ typedef int (*CmpFunction)(void *k1, void *k2);
 
 typedef struct
 {
-    void *key;
-    void *val;
+	void *key;
+	void *val;
 } HashTableItem;
 
 typedef struct HashTableIterator HashTableIterator;

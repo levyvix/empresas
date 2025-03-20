@@ -398,24 +398,6 @@ Vector *binary_tree_postorder_traversal_recursive(BinaryTree *bt)
 	return v3;
 }
 
-static void _node_destroy(Node *node, KeyDestroyFn key_destroy_fn, ValDestroyFn val_destroy_fn)
-{
-	if (node == NULL)
-	{
-		return;
-	}
-	_node_destroy(node->left, key_destroy_fn, val_destroy_fn);
-	_node_destroy(node->right, key_destroy_fn, val_destroy_fn);
-
-	// Destruir o KeyValPair do nó
-	key_destroy_fn(node->kvp->key);
-	val_destroy_fn(node->kvp->value);
-	free(node->kvp);
-
-	// Liberar o nó em si
-	free(node);
-}
-
 Node *_search_recursive(Node *node, void *min_key, void *max_key, Vector *v, CmpFn cmp_fn)
 {
 
