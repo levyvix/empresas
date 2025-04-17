@@ -60,6 +60,25 @@ Node *node_construct(void *value, Node *left, Node *right)
 	return new_node;
 }
 
+static Node *_add_recursive(Node *node, void *value, CmpFn cmp_fn)
+{
+	if (node == NULL)
+		return node_construct(value, NULL, NULL);
+
+	int cmp = cmp_fn(value, node->value);
+	if (cmp < 0)
+		node->left = _add_recursive(node->left, value, cmp_fn);
+	else if (cmp > 0)
+		node->right = _add_recursive(node->right, value, cmp_fn);
+
+	return node;
+}
+
+void binary_tree_add(BinaryTree *bt, void *value)
+{
+	bt->root = _add_recursive(bt->root, value, bt->cmp_fn);
+}
+
 static Node *_remove_recursive(Node *node, void *key, CmpFn cmp_fn, void **removed_value)
 {
 	if (node == NULL)
