@@ -55,7 +55,7 @@ void *hash_table_set(HashTable *h, void *key, void *val)
 		exit(EXIT_FAILURE);
 	}
 
-	new_node->item.key = strdup(key);
+	new_node->item.key = key;
 	new_node->item.val = val;
 	new_node->next = h->buckets[index];
 	h->buckets[index] = new_node;
@@ -161,7 +161,6 @@ void hash_table_destroy(HashTable *h)
 		while (node != NULL)
 		{
 			HashNode *next = node->next;
-			free(node->item.key);
 			free(node);
 			node = next;
 		}
