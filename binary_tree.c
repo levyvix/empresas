@@ -6,7 +6,7 @@
 
 typedef struct Node
 {
-	KeyValPair *kvp;
+	void *value;
 	struct Node *left;
 	struct Node *right;
 } Node;
@@ -15,31 +15,25 @@ struct BinaryTree
 {
 	Node *root;
 	CmpFn cmp_fn;
-	KeyDestroyFn key_destroy_fn;
+	GTK get_key;
 	ValDestroyFn val_destroy_fn;
 };
 
-void key_val_pair_destroy(KeyValPair *kvp)
-{
-	free(kvp);
-}
-
 BinaryTree *binary_tree_construct(
-	CmpFn cmp_fn, KeyDestroyFn key_destroy_fn,
-	ValDestroyFn val_destroy_fn)
+	CmpFn cmp_fn, GTK get_key, ValDestroyFn val_destroy_fn)
 {
 	BinaryTree *bt = malloc(sizeof(BinaryTree));
 	bt->root = NULL;
 	bt->cmp_fn = cmp_fn;
-	bt->key_destroy_fn = key_destroy_fn;
+	bt->get_key = get_key;
 	bt->val_destroy_fn = val_destroy_fn;
 	return bt;
 }
 
-Node *node_construct(KeyValPair *kvp, Node *left, Node *right)
+Node *node_construct(void *value, Node *left, Node *right)
 {
 	Node *new_node = malloc(sizeof(Node));
-	new_node->kvp = kvp;
+	new_node->value = value;
 	new_node->left = left;
 	new_node->right = right;
 	return new_node;
@@ -50,74 +44,29 @@ void node_destroy(Node *node)
 	free(node);
 }
 
-Node *_add_recursive(Node *node, KeyValPair *kvp, CmpFn cmp_fn)
+Node *_add_recursive(Node *node, void *value, CmpFn cmp_fn)
 {
 	if (node == NULL)
 	{
-		return node_construct(kvp, NULL, NULL);
+		return node_construct(value, NULL, NULL);
 	}
 
-	int cmp = cmp_fn(kvp->key, node->kvp->key);
+	int cmp = cmp_fn(value, node->value);
 	if (cmp < 0)
 	{
-		node->left = _add_recursive(node->left, kvp, cmp_fn);
+		node->left = _add_recursive(node->left, value, cmp_fn);
 	}
 	else if (cmp > 0)
 	{
-		node->right = _add_recursive(node->right, kvp, cmp_fn);
+		node->right = _add_recursive(node->right, value, cmp_fn);
 	}
 
 	return node;
 }
 
-KeyValPair *key_val_pair_construct(void *key, void *value)
+void binary_tree_add(BinaryTree *bt, void *value)
 {
-	KeyValPair *kv = malloc(sizeof(KeyValPair));
-	kv->key = key;
-	kv->value = value;
-
-	return kv;
-}
-
-void binary_tree_add(BinaryTree *bt, void *key, void *value)
-{
-	Node *new_node = node_construct(key_val_pair_construct(key, value), NULL, NULL);
-
-	if (bt->root == NULL)
-		bt->root = new_node;
-	else
-	{
-		Node *node = bt->root;
-
-		while (node != NULL)
-		{
-			if (bt->cmp_fn(key, node->kvp->key) == 0)
-			{
-				node_destroy(new_node);
-				return;
-			}
-			else if (bt->cmp_fn(key, node->kvp->key) < 0)
-			{
-				if (node->left == NULL)
-				{
-					node->left = new_node;
-					return;
-				}
-				else
-					node = node->left;
-			}
-			else
-			{
-				if (node->right == NULL)
-				{
-					node->right = new_node;
-					return;
-				}
-				else
-					node = node->right;
-			}
-		}
-	}
+	bt->root = _add_recursive(bt->root, value, bt->cmp_fn);
 }
 
 void *_get_recursive(Node *node, void *key, CmpFn cmp_fn)
@@ -127,10 +76,10 @@ void *_get_recursive(Node *node, void *key, CmpFn cmp_fn)
 		return NULL;
 	}
 
-	int cmp = cmp_fn(key, node->kvp->key);
+	int cmp = cmp_fn(key, node->value);
 	if (cmp == 0)
 	{
-		return node->kvp->value;
+		return node->value;
 	}
 	else if (cmp < 0)
 	{
@@ -141,16 +90,11 @@ void *_get_recursive(Node *node, void *key, CmpFn cmp_fn)
 		return _get_recursive(node->right, key, cmp_fn);
 	}
 
-	// return NULL;
+	return NULL;
 }
 
 void *binary_tree_get(BinaryTree *bt, void *key)
 {
-	if (bt == NULL || bt->root == NULL || key == NULL)
-	{
-		// Verifica se a árvore ou a chave são válidas
-		return NULL;
-	}
 	return _get_recursive(bt->root, key, bt->cmp_fn);
 }
 
@@ -159,11 +103,10 @@ void binary_tree_remove(BinaryTree *bt, void *key)
 	Node *actual = bt->root;
 	Node *parent = NULL;
 
-	// 1. Encontrar o nó a ser removido e seu pai
-	while (actual != NULL && bt->cmp_fn(key, actual->kvp->key) != 0)
+	while (actual != NULL && bt->cmp_fn(key, actual->value) != 0)
 	{
 		parent = actual;
-		if (bt->cmp_fn(key, actual->kvp->key) < 0)
+		if (bt->cmp_fn(key, actual->value) < 0)
 		{
 			actual = actual->left;
 		}
@@ -175,15 +118,14 @@ void binary_tree_remove(BinaryTree *bt, void *key)
 
 	if (actual == NULL)
 	{
-		return; // Nó não encontrado
+		return;
 	}
 
-	// 2. Caso 1: Nó é uma folha (sem filhos)
 	if (actual->left == NULL && actual->right == NULL)
 	{
 		if (parent == NULL)
 		{
-			bt->root = NULL; // O nó era a raiz
+			bt->root = NULL;
 		}
 		else if (parent->left == actual)
 		{
@@ -193,19 +135,16 @@ void binary_tree_remove(BinaryTree *bt, void *key)
 		{
 			parent->right = NULL;
 		}
-
-		// Liberar a memória do nó e do KeyValPair
-		bt->key_destroy_fn(actual->kvp->key);
-		key_val_pair_destroy(actual->kvp);
+		bt->val_destroy_fn(actual->value);
 		free(actual);
 	}
-	// 3. Caso 2: Nó tem apenas um filho à direita
+
 	else if (actual->left == NULL)
 	{
 		Node *child = actual->right;
 		if (parent == NULL)
 		{
-			bt->root = child; // O nó era a raiz
+			bt->root = child;
 		}
 		else if (parent->left == actual)
 		{
@@ -215,19 +154,17 @@ void binary_tree_remove(BinaryTree *bt, void *key)
 		{
 			parent->right = child;
 		}
+		bt->val_destroy_fn(actual->value);
 
-		// Liberar a memória do nó e do KeyValPair
-		bt->key_destroy_fn(actual->kvp->key);
-		key_val_pair_destroy(actual->kvp);
 		free(actual);
 	}
-	// 4. Caso 3: Nó tem apenas um filho à esquerda
+
 	else if (actual->right == NULL)
 	{
 		Node *child = actual->left;
 		if (parent == NULL)
 		{
-			bt->root = child; // O nó era a raiz
+			bt->root = child;
 		}
 		else if (parent->left == actual)
 		{
@@ -237,16 +174,14 @@ void binary_tree_remove(BinaryTree *bt, void *key)
 		{
 			parent->right = child;
 		}
+		bt->val_destroy_fn(actual->value);
 
-		// Liberar a memória do nó e do KeyValPair
-		bt->key_destroy_fn(actual->kvp->key);
-		key_val_pair_destroy(actual->kvp);
 		free(actual);
 	}
-	// 5. Caso 4: Nó tem dois filhos
+
 	else
 	{
-		// Encontrar o sucessor in-order (menor nó da subárvore direita)
+
 		Node *successor_parent = actual;
 		Node *successor = actual->right;
 
@@ -256,11 +191,8 @@ void binary_tree_remove(BinaryTree *bt, void *key)
 			successor = successor->left;
 		}
 
-		// Substituir a chave e valor do nó a ser removido
-		KeyValPair *old_kvp = actual->kvp;
-		actual->kvp = successor->kvp;
+		actual->value = successor->value;
 
-		// Remover o sucessor (que terá no máximo um filho à direita)
 		if (successor_parent->left == successor)
 		{
 			successor_parent->left = successor->right;
@@ -270,73 +202,38 @@ void binary_tree_remove(BinaryTree *bt, void *key)
 			successor_parent->right = successor->right;
 		}
 
-		// Liberar a memória do KeyValPair antigo
-		bt->key_destroy_fn(old_kvp->key);
-		key_val_pair_destroy(old_kvp);
-
-		// Liberar o nó sucessor
 		free(successor);
 	}
 }
 
-KeyValPair *binary_tree_pop_min(BinaryTree *bt)
+void *binary_tree_pop_min(BinaryTree *bt)
 {
 	if (bt == NULL || bt->root == NULL)
 		return NULL;
 
 	Node *current = bt->root;
 
-	// Find the leftmost node (min)
 	while (current->left != NULL)
 	{
 		current = current->left;
 	}
 
-	KeyValPair *kvp = current->kvp;
-
-	// // Adjust parent links
-	// if (parent == NULL)
-	// {
-	// 	// The root is the minimum node
-	// 	bt->root = current->right;
-	// }
-	// else
-	// {
-	// 	parent->left = current->right;
-	// }
-
-	// free(current); // Free the node but not the KeyValPair
-	return kvp;
+	return current->value;
 }
 
-KeyValPair *binary_tree_pop_max(BinaryTree *bt)
+void *binary_tree_pop_max(BinaryTree *bt)
 {
 	if (bt == NULL || bt->root == NULL)
 		return NULL;
 
 	Node *current = bt->root;
 
-	// Find the rightmost node (max)
 	while (current->right != NULL)
 	{
 		current = current->right;
 	}
 
-	KeyValPair *kvp = current->kvp;
-
-	// // Adjust parent links
-	// if (parent == NULL)
-	// {
-	// 	// The root is the maximum node
-	// 	bt->root = current->left;
-	// }
-	// else
-	// {
-	// 	parent->right = current->left;
-	// }
-
-	// free(current); // Free the node but not the KeyValPair
-	return kvp;
+	return current->value;
 }
 
 void _inorder(Node *node, Vector *v)
@@ -346,7 +243,7 @@ void _inorder(Node *node, Vector *v)
 		return;
 	}
 	_inorder(node->left, v);
-	vector_push_back(v, node->kvp);
+	vector_push_back(v, node->value);
 	_inorder(node->right, v);
 }
 
@@ -365,7 +262,7 @@ void _preorder(Node *node, Vector *v)
 	{
 		return;
 	}
-	vector_push_back(v, node->kvp);
+	vector_push_back(v, node->value);
 	_preorder(node->left, v);
 	_preorder(node->right, v);
 }
@@ -387,7 +284,7 @@ void _postorder(Node *node, Vector *v)
 	}
 	_postorder(node->left, v);
 	_postorder(node->right, v);
-	vector_push_back(v, node->kvp);
+	vector_push_back(v, node->value);
 }
 
 Vector *binary_tree_postorder_traversal_recursive(BinaryTree *bt)
@@ -398,22 +295,20 @@ Vector *binary_tree_postorder_traversal_recursive(BinaryTree *bt)
 	return v3;
 }
 
-Node *_search_recursive(Node *node, void *min_key, void *max_key, Vector *v, CmpFn cmp_fn)
+void _search_recursive(Node *node, void *min_key, void *max_key, Vector *v, CmpFn cmp_fn)
 {
 
 	if (node == NULL)
 	{
-		return NULL;
+		return;
 	}
 
 	_search_recursive(node->left, min_key, max_key, v, cmp_fn);
-	if (cmp_fn(node->kvp->key, min_key) >= 0 && cmp_fn(node->kvp->key, max_key) <= 0)
+	if (cmp_fn(node->value, min_key) >= 0 && cmp_fn(node->value, max_key) <= 0)
 	{
-		vector_push_back(v, node->kvp->value);
+		vector_push_back(v, node->value);
 	}
 	_search_recursive(node->right, min_key, max_key, v, cmp_fn);
-
-	return NULL;
 }
 
 Vector *binary_tree_interval(BinaryTree *bt, void *min_key, void *max_key)
@@ -426,18 +321,96 @@ Vector *binary_tree_interval(BinaryTree *bt, void *min_key, void *max_key)
 	return v;
 }
 
-void _destroy_node_recursive(Node *node)
+void _destroy_node_recursive(Node *node, ValDestroyFn val_destroy_fn)
 {
 	if (node == NULL)
 		return;
 
-	_destroy_node_recursive(node->left);
-	_destroy_node_recursive(node->right);
+	_destroy_node_recursive(node->left, val_destroy_fn);
+	_destroy_node_recursive(node->right, val_destroy_fn);
+	val_destroy_fn(node->value);
 	node_destroy(node);
 }
 
+double _fabs(double x)
+{
+
+	return x > 0 ? x : -x;
+}
+
+void _busca_proximo(Node *node, void *key, Node **closest, double *min_distance, CmpFn cmp_fn, GTK get_key)
+{
+	if (node == NULL)
+		return;
+
+	int cmp = cmp_fn(key, node->value);
+	if (cmp == 0)
+	{
+		_busca_proximo(node->left, key, closest, min_distance, cmp_fn, get_key);
+		_busca_proximo(node->right, key, closest, min_distance, cmp_fn, get_key);
+		return;
+	}
+
+	double current_distance = _fabs(*(double *)get_key(key) - *(double *)get_key(node->value));
+
+	if (current_distance < *min_distance)
+	{
+		*min_distance = current_distance;
+		*closest = node;
+	}
+
+	if (current_distance == *min_distance)
+	{
+		// comparaco entre closest e actual
+		Node *node_closest = *closest;
+		cmp = cmp_fn(node_closest->value, node->value);
+
+		// se o actual for mais proximo do que o closest
+		if (cmp > 0)
+			*closest = node;
+	}
+
+	_busca_proximo(node->left, key, closest, min_distance, cmp_fn, get_key);
+	_busca_proximo(node->right, key, closest, min_distance, cmp_fn, get_key);
+}
+void *binary_tree_find_nearest(BinaryTree *bt, void *key)
+{
+	if (bt == NULL || bt->root == NULL || key == NULL)
+		return NULL;
+
+	double min_distance = 999999;
+	Node *closest = NULL;
+
+	_busca_proximo(bt->root, key, &closest, &min_distance, bt->cmp_fn, bt->get_key);
+
+	return (closest != NULL) ? closest->value : NULL;
+}
+
+/// PRINT TREE
+void _print_tree(Node *node, int level, void *(*get_key)(void *))
+{
+	if (node == NULL)
+		return;
+
+	_print_tree(node->right, level + 1, get_key);
+
+	for (int i = 0; i < level; i++)
+		printf("    ");
+
+	printf("%lf (%s)\n", *(double *)get_key(node->value), (char *)node->value);
+
+	_print_tree(node->left, level + 1, get_key);
+}
+
+void print_tree(BinaryTree *bt)
+{
+	_print_tree(bt->root, 0, bt->get_key);
+}
+
+/// PRINT TREE
+
 void binary_tree_destroy(BinaryTree *bt)
 {
-	_destroy_node_recursive(bt->root);
+	_destroy_node_recursive(bt->root, bt->val_destroy_fn);
 	free(bt);
 }

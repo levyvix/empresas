@@ -5,14 +5,13 @@
 #include <math.h>
 #include <string.h>
 
-#define EPSILON 0.0001
-
 typedef struct Jogador
 {
 	char nickname[100];
 	char nome[100];
 	int vitorias;
 	int partidas;
+	double win_pct;
 } Jogador;
 
 int hash_str(HashTable *h, void *data)
@@ -28,6 +27,30 @@ int hash_str(HashTable *h, void *data)
 	return hash_val;
 }
 
+void print_hash_key(void *key)
+{
+	printf("%s\n", (char *)key);
+}
+
+void print_jogador(void *jogador)
+{
+	Jogador *j = (Jogador *)jogador;
+	printf("%s %s %d %d %lf\n", j->nickname, j->nome, j->vitorias, j->partidas, j->win_pct);
+}
+
+void print_hash_value(void *val)
+{
+	Jogador *j = (Jogador *)val;
+	print_jogador(j);
+}
+
+void *get_key(void *obj)
+{
+	Jogador *jogador = (Jogador *)obj;
+
+	return &jogador->win_pct;
+}
+
 int cmp_str(void *a, void *b)
 {
 	return strcmp((char *)a, (char *)b);
@@ -35,36 +58,42 @@ int cmp_str(void *a, void *b)
 
 int cmp_chave(void *a, void *b)
 {
-	float chaveA = *(float *)a;
-	float chaveB = *(float *)b;
-	if (chaveA == chaveB)
-		return 0;
-	return (chaveA > chaveB) ? 1 : -1;
-}
+	Jogador *jogadorA = (Jogador *)a;
+	Jogador *jogadorB = (Jogador *)b;
 
-void key_destroy_fn(void *key)
-{
-	free(key);
+	double winA = jogadorA->win_pct;
+	double winB = jogadorB->win_pct;
+
+	if (winA == winB)
+	{
+		char *nicknameA = jogadorA->nickname;
+		char *nicknameB = jogadorB->nickname;
+
+		return strcmp(nicknameA, nicknameB);
+	}
+	else
+	{
+		return (winA > winB) ? 1 : -1;
+	}
 }
 
 void val_destroy_fn(void *val)
 {
 	Jogador *j = (Jogador *)val;
 	if (j == NULL)
-	{
 		return;
-	}
 
 	free(j);
 }
 
-Jogador *jogador_construct(char *nickname, char *nome, int vitorias, int partidas)
+Jogador *jogador_construct(char *nickname, char *nome, int vitorias, int partidas, double win_pct)
 {
 	Jogador *jogador = malloc(sizeof(Jogador));
 	strcpy(jogador->nickname, nickname);
 	strcpy(jogador->nome, nome);
 	jogador->vitorias = vitorias;
 	jogador->partidas = partidas;
+	jogador->win_pct = win_pct;
 	return jogador;
 }
 
@@ -82,7 +111,7 @@ int main()
 {
 	char arquivo[100];
 	HashTable *hash = hash_table_construct(23, hash_str, cmp_str);
-	BinaryTree *tree = binary_tree_construct(cmp_chave, key_destroy_fn, val_destroy_fn);
+	BinaryTree *tree = binary_tree_construct(cmp_chave, get_key, val_destroy_fn);
 
 	scanf("%s", arquivo);
 
@@ -104,19 +133,19 @@ int main()
 		int partidas;
 		fscanf(arq, "%s %s %d %d", nickname, nome, &vitorias, &partidas);
 
-		Jogador *jogador = jogador_construct(nickname, nome, vitorias, partidas);
+		Jogador *jogador = jogador_construct(nickname, nome, vitorias, partidas, vitorias / (double)partidas);
 
 		Jogador *jogador_antigo = hash_table_set(hash, jogador->nickname, jogador);
+
 		if (jogador_antigo != NULL)
 		{
 			free(jogador_antigo);
 		}
-		float *valorKey = malloc(sizeof(float));
-		*valorKey = round(((float)jogador->vitorias / (float)jogador->partidas) * 100) / 100;
-		binary_tree_add(tree, valorKey, jogador);
+
+		binary_tree_add(tree, jogador);
 		i++;
 	}
-
+	// print_tree(tree);
 	fclose(arq);
 
 	int m;
@@ -126,7 +155,7 @@ int main()
 	{
 		char operacao[32];
 		scanf("%s", operacao);
-		// TODO: implementar MATCH e knn
+
 		if (strcmp(operacao, "GET") == 0)
 		{
 			char nickname[100];
@@ -152,23 +181,31 @@ int main()
 
 			if (jogador == NULL)
 			{
-				printf("RM: Empresa nao encontrada\n");
+				printf("RM: Jogador nao encontrado\n");
 			}
 			else
 			{
-				float *valor_key = malloc(sizeof(float));
-				*valor_key = round(((float)jogador->vitorias / (float)jogador->partidas) * 100) / 100;
-				binary_tree_remove(tree, valor_key);
-				free(valor_key);
+
+				Jogador *chave = jogador_construct(jogador->nickname, "A", 0, 0, jogador->win_pct);
+				binary_tree_remove(tree, chave);
+				free(chave);
 			}
 		}
 		else if (strcmp(operacao, "INTERVAL") == 0)
 		{
-			float min, max;
-			scanf("%f", &min);
-			scanf("%f", &max);
+			// print_tree(tree);
+			double min, max;
+			scanf("%lf", &min);
+			scanf("%lf", &max);
 
-			Vector *interval = binary_tree_interval(tree, &min, &max);
+			Jogador *chave_min = jogador_construct("A", "A", 0, 0, min); // quando tem 100% de win_rate, qualquer nome sempre vai ser maior
+
+			Jogador *chave_max = jogador_construct("zzzzzzzzzzzzzzzzzzzzz", "A", 0, 0, max); // quando tem 100% de win_rate, qualquer nome sempre vai ser menor
+
+			Vector *interval = binary_tree_interval(tree, chave_min, chave_max);
+
+			free(chave_min);
+			free(chave_max);
 
 			for (int i = 0; i < vector_size(interval); i++)
 			{
@@ -180,14 +217,13 @@ int main()
 		}
 		else if (strcmp(operacao, "MIN") == 0)
 		{
-			KeyValPair *kvp_min = binary_tree_pop_min(tree);
-			Jogador *jogador = (Jogador *)kvp_min->value;
+			Jogador *jogador = binary_tree_pop_min(tree);
 			printf("%s\n", jogador->nickname);
 		}
 		else if (strcmp(operacao, "MAX") == 0)
 		{
-			KeyValPair *kvp_max = binary_tree_pop_max(tree);
-			Jogador *jogador = (Jogador *)kvp_max->value;
+			// print_tree(tree);
+			Jogador *jogador = binary_tree_pop_max(tree);
 			printf("%s\n", jogador->nickname);
 		}
 		else if (strcmp(operacao, "SORTED") == 0)
@@ -195,75 +231,93 @@ int main()
 			Vector *v = binary_tree_inorder_traversal_recursive(tree);
 			for (int i = 0; i < vector_size(v); i++)
 			{
-				KeyValPair *kvp = vector_get(v, i);
-				Jogador *jogador = (Jogador *)kvp->value;
-				float percentual = *(float *)kvp->key;
-				printf("%s %.2f\n", jogador->nickname, percentual);
+				Jogador *jogador = vector_get(v, i);
+				printf("%s %.2f\n", jogador->nickname, jogador->win_pct);
 			}
 			vector_destroy(v);
 		}
 		else if (strcmp(operacao, "VICTORIES") == 0)
 		{
-
-			// o número de vitórias e de partidas deve ser
-			// incrementado de qtd para o jogador em ambas as estruturas. Na árvore, o
-			// percentual de vitórias anterior deve ser usado para remover os dados do jogador e
-			// um novo registro deve ser inserido com as quantidades atualizadas.
-
 			char nickname[100];
-			scanf("%s", nickname);
+			int qtd;
+			scanf("%s %d", nickname, &qtd);
 
 			Jogador *jogador = hash_table_get(hash, nickname);
 
 			if (jogador == NULL)
 			{
-				printf("VICTORIES: Jogador nao encontrado\n");
+				printf("VICTORIES: Jogador %s nao encontrado\n", nickname);
 			}
 			else
 			{
+				Jogador *novo_jogador = jogador_construct(
+					jogador->nickname,
+					jogador->nome,
+					jogador->vitorias + qtd,
+					jogador->partidas + qtd,
+					(jogador->vitorias + qtd) / (double)(jogador->partidas + qtd));
 
-				float *valor_key = malloc(sizeof(float));
-				*valor_key = round(((float)jogador->vitorias / (float)jogador->partidas) * 100) / 100;
-				binary_tree_remove(tree, valor_key);
-				free(valor_key);
+				hash_table_set(hash, nickname, novo_jogador);
 
-				jogador->partidas++;
-				jogador->vitorias++;
+				Jogador *chave = jogador_construct(nickname, "A", 0, 0, jogador->win_pct);
+				binary_tree_remove(tree, chave);
+				free(chave);
 
-				Jogador *novo_jogador = jogador_construct(jogador->nickname, jogador->nome, jogador->vitorias, jogador->partidas);
-
-				float *novo_valor_key = malloc(sizeof(float));
-				*novo_valor_key = round(((float)novo_jogador->vitorias / (float)novo_jogador->partidas) * 100) / 100;
-				binary_tree_add(tree, novo_valor_key, novo_jogador);
+				binary_tree_add(tree, novo_jogador);
 			}
 		}
 		else if (strcmp(operacao, "DEFEATS") == 0)
 		{
 			char nickname[100];
-			scanf("%s", nickname);
+			int qtd;
+			scanf("%s %d", nickname, &qtd);
 
 			Jogador *jogador = hash_table_get(hash, nickname);
 
 			if (jogador == NULL)
 			{
-				printf("DEFEATS: Jogador nao encontrado\n");
+				printf("DEFEATS: Jogador %s nao encontrado\n", nickname);
 			}
 			else
 			{
+				Jogador *novo_jogador = jogador_construct(
+					nickname,
+					jogador->nome,
+					jogador->vitorias,
+					jogador->partidas + qtd,
+					(jogador->vitorias) / (double)(jogador->partidas + qtd));
 
-				float *valor_key = malloc(sizeof(float));
-				*valor_key = round(((float)jogador->vitorias / (float)jogador->partidas) * 100) / 100;
-				binary_tree_remove(tree, valor_key);
-				free(valor_key);
+				hash_table_set(hash, nickname, novo_jogador);
 
-				jogador->partidas++;
-				// jogador->vitorias++;
+				Jogador *chave = jogador_construct(nickname, "A", 0, 0, jogador->win_pct);
+				binary_tree_remove(tree, chave);
+				free(chave);
 
-				Jogador *novo_jogador = jogador_construct(jogador->nickname, jogador->nome, jogador->vitorias, jogador->partidas);
+				binary_tree_add(tree, novo_jogador);
+			}
+		}
+		else if (strcmp(operacao, "MATCH") == 0)
+		{
+			// print_tree(tree);
+			// hash_table_print(hash, print_hash_key, print_hash_value);
 
-				float *novo_valor_key = malloc(sizeof(float));
-				*novo_valor_key = round(((float)novo_jogador->vitorias / (float)novo_jogador->partidas) * 100) / 100;
-				binary_tree_add(tree, novo_valor_key, novo_jogador);
+			char nickname[100];
+			scanf("%s", nickname);
+
+			Jogador *jogador = hash_table_get(hash, nickname);
+
+			Jogador *chave = jogador_construct(jogador->nickname, "A", 0, 0, jogador->win_pct);
+
+			Jogador *jogador_proximo = binary_tree_find_nearest(tree, chave);
+			free(chave);
+
+			if (jogador_proximo == NULL)
+			{
+				printf("MATCH: Jogador nao encontrado\n");
+			}
+			else
+			{
+				printf("%s\n", jogador_proximo->nickname);
 			}
 		}
 	}
