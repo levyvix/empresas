@@ -15,8 +15,6 @@ typedef struct
 	void *val;
 } HashTableItem;
 
-typedef struct HashTableIterator HashTableIterator;
-
 // constroi a hash
 HashTable *hash_table_construct(int table_size, HashFunction hash_fn, CmpFunction cmp_fn);
 
@@ -39,17 +37,7 @@ int hash_table_num_elems(HashTable *h);
 // libera o espaco alocado para a tabela hash
 void hash_table_destroy(HashTable *h);
 
-// cria um novo iterador para a tabela hash
-HashTableIterator *hash_table_iterator(HashTable *h);
-
-// retorna 1 se o iterador chegou ao fim da tabela hash ou 0 caso contrario
-int hash_table_iterator_is_over(HashTableIterator *it);
-
-// retorna o proximo par chave valor da tabela hash
-HashTableItem *hash_table_iterator_next(HashTableIterator *it);
-
-// desaloca o iterador da tabela hash
-void hash_table_iterator_destroy(HashTableIterator *it);
+void hash_table_print(HashTable *h, void (*print_key)(void *), void (*print_value)(void *));
 
 Vector *hash_to_vector(HashTable *h);
 

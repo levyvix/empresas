@@ -1,0 +1,676 @@
+jogadores8.txt
+674
+INTERVAL 0.94 1.06
+VICTORIES NapolitanaAgatha1637 58
+MATCH TarArthur6406
+GET CatarinaAjaxanimator1943
+MIN
+MIN
+VICTORIES HelenaSpinalcord42094 100
+DEFEATS DaniloCamba2800 89
+SORTED
+MAX
+VICTORIES CaueThirra8878 20
+GET WolframCatarina6570
+VICTORIES AndradeTar8187 50
+VICTORIES NicolasWaffles218 16
+MATCH TinaGoncalves2174
+SORTED
+INTERVAL 0.3 0.96
+GET ChampignonFigueiredo7432
+RM Box86Araujo6401
+RM MagalhaesStructural394
+GET Amira3dVaz8626
+MAX
+DEFEATS SasHeloise9521 51
+MIN
+SORTED
+GET AlmeidaJdbc8507
+MAX
+MATCH TarantoolCecilia5424
+MATCH VelosoLapack543
+DEFEATS AntonellaComsol9377 62
+MAX
+DEFEATS PortalElectrical7171 84
+DEFEATS PortalNs22862 85
+MATCH PlotutilsGramacho6611
+INTERVAL 0.71 1.77
+GET DanielDatabasetools7102
+SORTED
+RM CamposRomana4824
+DEFEATS BritesPcem3769 63
+RM MarceloErpnext24
+RM GuimaraesHttp951
+VICTORIES ConductingBruno1892 93
+MAX
+MAX
+MIN
+RM CoreutilsAnlicoara5582
+VICTORIES NagProenca8953 98
+SORTED
+RM ElkiVitoria8430
+DEFEATS ChampignonBetina7247 13
+VICTORIES CotrimAliche7419 66
+MATCH EmillyAdmb6842
+MATCH NeuroimagingGabriel165
+RM CarnesecaGiovanni7729
+SORTED
+MIN
+MIN
+INTERVAL 0.6 1.75
+RM SaphanaIgor2201
+RM AtaideMarguerita8832
+RM HazelcastFrade2810
+SORTED
+MATCH ParmegianaFerronha6071
+VICTORIES KevinScreen8960 30
+MATCH BorgesEagle9957
+INTERVAL 0.96 1.43
+MATCH MathcadPrado3286
+INTERVAL 0.91 1.39
+INTERVAL 0.51 1.06
+MIN
+GET MathematicaMalu9798
+MATCH PietroCarneseca1962
+MIN
+GET HoltremanPari3278
+MAX
+INTERVAL 0.01 0.31
+MIN
+MATCH SynfigPicao3204
+GET EmillyAdmb6842
+INTERVAL 0.48 0.5
+MIN
+DEFEATS XcircuitLorena1149 70
+RM HttpRenan4603
+MATCH DuckdbFerronha1332
+SORTED
+MIN
+RM McmasterIsabelly9726
+RM AlmeidaRomeuejulieta2323
+MAX
+GET BettencourtAdobeanimate4227
+VICTORIES PacocaYuri169 93
+RM ResendeSpectanalysis5483
+MAX
+MAX
+GET MineiraLeme353
+MIN
+DEFEATS AliceMemcached6326 30
+DEFEATS BaconVinicius3112 7
+VICTORIES MirandaHenriquesPerl2001 65
+VICTORIES PcemRodrigues9080 9
+VICTORIES VazSysquake6410 7
+GET MnesiaEsther7362
+MATCH SoverosaAtum2509
+MAX
+INTERVAL 0.22 1.1
+RM MussarelaPais1406
+INTERVAL 0.23 0.46
+MIN
+MIN
+VICTORIES TarantoolCecilia5424 8
+GET WafflesBettencourt4892
+MIN
+MATCH FerronhaAndroid3278
+SORTED
+RM CarlosSourcetoolbox9297
+INTERVAL 0.1 1.56
+VICTORIES NugetFigueiredo2850 38
+RM CarvalhoMohoanimestudio2768
+INTERVAL 0.15 0.85
+DEFEATS LuccaPari9692 33
+MATCH BettencourtSaberrd2088
+SORTED
+SORTED
+DEFEATS MariaVisualfoxpro5277 84
+VICTORIES BeijinhoVaz8800 60
+MIN
+RM SqlIsis4686
+MAX
+MAX
+VICTORIES DrawplusHenriques1559 47
+RM AlhoeoleoDavi3997
+VICTORIES BiancaCrazytalk263 45
+MAX
+MATCH RebecaRomeuejulieta7731
+VICTORIES RoutersimJade7065 82
+RM OpenemrLais8663
+SORTED
+MAX
+RM HelenaSpinalcord42094
+INTERVAL 0.16 0.24
+INTERVAL 0.37 1.03
+SORTED
+MIN
+MAX
+DEFEATS LimaSysquake9084 23
+RM StructuralFrade3077
+MATCH JuliaHadassa4649
+RM GamaGwbasic1653
+INTERVAL 0.27 1.56
+MAX
+MATCH DrawplusHenriques1559
+SORTED
+GET FenicsGuedes666
+GET EmanuellyGroff7444
+MATCH IsisCcli919
+INTERVAL 0.04 1.36
+GET ChocolateBandeira2064
+MATCH EnveRicardo2888
+DEFEATS CalabresaCosta4366 70
+SORTED
+VICTORIES LorenaBash2952 84
+SORTED
+DEFEATS CursusdbCabecadeVaca2338 54
+MIN
+MAX
+MIN
+MATCH FreireEspanhola6009
+MAX
+INTERVAL 0.13 1.65
+MAX
+MAX
+MATCH DanielDatabasetools7102
+INTERVAL 0.1 1.84
+DEFEATS QemuCastro1126 79
+GET GabrielFreemat5442
+DEFEATS MysqlndbclusterAntonio325 17
+INTERVAL 0.06 1.29
+SORTED
+MATCH PearpcEinloft8762
+GET HermesRenato4641
+MAX
+MIN
+GET AmigabasicFrade7630
+DEFEATS ZeprsRicardo4248 99
+RM BananacomcanelaKevin5712
+MATCH BenicioZcore2326
+MATCH MarianaHttp6854
+MATCH SwishmaxRicardo7781
+SORTED
+RM CotrimAliche7419
+MIN
+SORTED
+MIN
+MAX
+INTERVAL 0.63 1.28
+INTERVAL 0.08 0.51
+RM FreireIdl7454
+RM PietroCarneseca1962
+INTERVAL 0.67 1.93
+MATCH AtaideBrasileira6585
+MATCH BenevidesDataplot963
+MATCH EnveRicardo2888
+MAX
+RM RetasAraujo9192
+DEFEATS BorgesEagle9957 65
+RM FradeEspanhola600
+MIN
+SORTED
+SORTED
+MATCH PortalEjs7243
+GET AntonellaComsol9377
+MIN
+MATCH PerstVitoria3611
+RM LabplotGomes9392
+DEFEATS NicolasWaffles218 18
+MAX
+VICTORIES ConductingBruno1892 84
+INTERVAL 0.49 0.75
+INTERVAL 0.5 0.85
+MIN
+MIN
+MIN
+SORTED
+SORTED
+VICTORIES DanielDatabasetools7102 81
+DEFEATS CarlosOptimj2096 81
+MIN
+GET ChocolateBandeira2064
+VICTORIES TinaGoncalves2174 93
+GET LeonardoQemu4923
+MAX
+VICTORIES SamuelMethod7472 53
+MATCH TheoBeijinho5108
+GET DldirectLais1339
+MAX
+VICTORIES VisualjOliveira9719 42
+VICTORIES SaberrdLivia9430 27
+SORTED
+RM FlexproJuan2439
+MAX
+RM PcemRodrigues9080
+MIN
+GET SamuelMethod7472
+MAX
+SORTED
+INTERVAL 0.86 1.23
+VICTORIES NapolitanaAntonio3623 32
+RM ParmegianaFerronha6071
+RM MirandaHenriquesPerl2001
+RM CalabresaElis6730
+SORTED
+INTERVAL 0.74 1.07
+VICTORIES Ns2Anlicoara1027 93
+MIN
+DEFEATS VisualbasicnetDiego1137 52
+RM ChampignonBetina7247
+RM VieiraGlaxnimate1306
+SORTED
+MIN
+GET ShogunRafaela3533
+VICTORIES LaraQuiteuniversal5648 2
+INTERVAL 0.99 1.12
+INTERVAL 0.63 1.91
+MIN
+GET EstevesGrub3900
+MIN
+INTERVAL 0.61 1.14
+MATCH CalabresaCosta4366
+INTERVAL 0.57 0.93
+MAX
+INTERVAL 0.27 1.27
+VICTORIES MadrugaCpio4797 70
+SORTED
+MIN
+RM LorenaMlpack309
+MIN
+VICTORIES CasadaMaiaCygwin2840 32
+INTERVAL 0.04 0.88
+GET AbelhoCanadense6401
+VICTORIES IsabellyDataplot8002 73
+INTERVAL 0.05 0.13
+MAX
+VICTORIES CanadenseGuilherme3448 82
+DEFEATS CeciliaMarguerita1827 33
+INTERVAL 0.26 0.57
+MAX
+RM PearpcPais8572
+RM RebecaJava8904
+VICTORIES GustavoRust3429 89
+MAX
+MATCH HospitalosRodrigues3188
+GET CygwinSousa4548
+INTERVAL 0.46 1.04
+MAX
+MATCH TexinfoVieira9905
+RM CotrimCamba4799
+GET WordbasicYasmin9888
+VICTORIES ManuelaNet3220 31
+MATCH LiviaAzuredevops7577
+SORTED
+INTERVAL 0.53 1.28
+RM PortalElectrical7171
+VICTORIES AlmeidaAcslx7344 4
+MIN
+MAX
+SORTED
+GET ChampignonGabriela901
+MATCH LombinhoGomes1982
+MATCH AguiarVstsprofiler1777
+DEFEATS CostaMango9854 67
+RM MirellaToolbox7142
+GET NapolitanaAgatha1637
+RM CursusdbCabecadeVaca2338
+GET TelesWine3502
+INTERVAL 0.87 0.91
+GET WordbasicYasmin9888
+RM CangucuMathcad7981
+INTERVAL 0.0 0.36
+VICTORIES CambaEinloft6865 7
+INTERVAL 0.06 1.33
+SORTED
+MAX
+MAX
+DEFEATS CalebeRedis9745 3
+MIN
+RM MnesiaEsther7362
+VICTORIES SynfigPicao3204 21
+MAX
+MATCH ChampignonFigueiredo7432
+SORTED
+DEFEATS EmtprvGuedes5451 58
+INTERVAL 0.31 0.93
+MIN
+SORTED
+MATCH QemuCastro1126
+RM GramachoLive2d7657
+GET SalazarHosxp8674
+RM RomanaTeixeira9484
+DEFEATS RafaelChocolate5422 74
+RM CorteRealTarantool6025
+VICTORIES DaniloAdonet4514 63
+SORTED
+MATCH DaniloGlaxnimate1386
+GET AntasPrestigio2564
+MAX
+MATCH AlvimCanadense8780
+VICTORIES LeticiaFx32222 89
+MIN
+DEFEATS OpendentalLeticia8335 20
+DEFEATS DaniloGlaxnimate1386 96
+RM AmigabasicFrade7630
+MIN
+MATCH PearpcEinloft8762
+MATCH ThalesEscarola3624
+DEFEATS CerqueiraPhysiological6426 3
+VICTORIES HeloiseBash3476 50
+MAX
+VICTORIES MariaVisualfoxpro5277 65
+SORTED
+RM LorenaBash2952
+VICTORIES AerospikedbsMontenegro8556 1
+MATCH OpenemrFrade9729
+VICTORIES MirandaHenriquesHavaiana5209 12
+GET SasHeloise9521
+RM ConductingBruno1892
+MAX
+MAX
+DEFEATS RetasRafaela9834 54
+GET CarneiroAql3328
+RM PhpMariah292
+MAX
+INTERVAL 0.02 0.17
+RM LaviniaRomana2369
+GET TexinfoVieira9905
+MATCH AliceQtiplot5175
+VICTORIES NevesJdbc3501 25
+MATCH VisualbasicnetDiego1137
+MAX
+SORTED
+INTERVAL 0.47 0.74
+DEFEATS UscCampos4418 97
+RM VitoriaZeprs2522
+MIN
+MAX
+MAX
+SORTED
+SORTED
+SORTED
+RM DanielDatabasetools7102
+MAX
+DEFEATS DuckdbFerronha1332 10
+MATCH AliciaJulia4103
+MAX
+MAX
+MAX
+SORTED
+MAX
+GET MariaPalmito7090
+GET AtaideBrasileira6585
+DEFEATS IgorBolonhesa1790 40
+MAX
+DEFEATS MelissaRomana6716 77
+MIN
+GET MataFlexpro8131
+DEFEATS AlexandreMicrosoftxna3448 11
+INTERVAL 0.45 1.25
+MATCH CerqueiraPhysiological6426
+VICTORIES MelissaRomana6716 87
+MAX
+SORTED
+SORTED
+INTERVAL 0.71 1.78
+MIN
+INTERVAL 0.96 1.85
+MAX
+MIN
+GET ParametricFrade691
+VICTORIES IgorKicad6699 28
+GET BandeiraRoutersim7745
+MATCH ComsolSousa5707
+MAX
+VICTORIES EmanuellyGroff7444 22
+MAX
+DEFEATS NagProenca8953 73
+DEFEATS AndradeCamarao1310 28
+GET IsabellyDataplot8002
+MATCH MargueritaTheo2956
+INTERVAL 0.72 0.98
+INTERVAL 0.03 0.29
+MATCH CarlosOptimj2096
+RM MrimagesPicao2793
+INTERVAL 0.4 1.36
+RM CommodorebasicMelinda8366
+GET MirandaHenriquesPalmito8500
+SORTED
+DEFEATS CambaEinloft6865 92
+VICTORIES AranhaAnalytica3212 98
+RM AranhaSourcetoolbox3402
+VICTORIES RomeuejulietaMelissa4502 4
+SORTED
+DEFEATS TexinfoVieira9905 88
+GET ApacheigniteCalebe5341
+DEFEATS MarinaPolyhedra9363 54
+MIN
+INTERVAL 0.17 1.91
+SORTED
+DEFEATS CalebeRedis9745 95
+MAX
+INTERVAL 0.52 1.42
+MAX
+VICTORIES HomemXcircuit7801 20
+INTERVAL 0.02 1.39
+DEFEATS ClrprofilerFernandes3181 40
+SORTED
+MAX
+VICTORIES MadrugaCpio4797 97
+DEFEATS DldirectLais1339 34
+RM SoliddbAguiar8031
+MAX
+MIN
+MAX
+MIN
+VICTORIES BandeiraRoutersim7745 18
+SORTED
+MATCH PepperoniLeonardo6183
+SORTED
+SORTED
+GET TarArthur6406
+MIN
+MATCH AbelhoRomana6320
+GET VelosoLapack543
+INTERVAL 0.12 1.6
+MATCH NapolitanaAgatha1637
+MATCH HoltremanVegetariana8563
+DEFEATS LaisBauru2888 29
+GET SousaRuby6589
+MATCH MatheusHavaiana3596
+GET GabrielFreemat5442
+MIN
+SORTED
+MIN
+DEFEATS BaconVinicius3112 3
+SORTED
+INTERVAL 0.65 1.32
+GET BerenguerSimulink3194
+MATCH CamaraoMatheus9140
+INTERVAL 0.67 1.58
+SORTED
+MIN
+MIN
+DEFEATS PawRodrigues9779 43
+VICTORIES AndradeCamarao1310 37
+MATCH LeaddbsHoltreman4647
+VICTORIES HomemAmira3d6988 97
+GET NicolasWaffles218
+RM RomeuejulietaTeixeira7533
+MIN
+MAX
+RM OpenemrLorenzo2808
+VICTORIES MathcadPrado3286 6
+INTERVAL 0.52 0.69
+RM RetasKevin8795
+RM LearningAnthony1324
+DEFEATS BiancaCrazytalk263 73
+MAX
+DEFEATS KritaGabriel5155 39
+MAX
+SORTED
+GET PynetsJesus4285
+MIN
+DEFEATS ToonzCarneiro6884 31
+SORTED
+MIN
+SORTED
+DEFEATS JsonldMaria9573 86
+DEFEATS LeticiaFx32222 30
+MAX
+SORTED
+SORTED
+GET FreecadEmanuelly7234
+RM PspiceCaio9739
+MIN
+DEFEATS BluestacksClarice6461 61
+MATCH NeuroimagingGabriel165
+DEFEATS RetasRafaela9834 4
+RM BryanRoot1928
+SORTED
+DEFEATS CerqueiraPhysiological6426 3
+VICTORIES CameloRomeuejulieta4258 43
+DEFEATS FenicsGuedes666 53
+GET LabviewPinto4828
+MAX
+VICTORIES CasadaMaiaCygwin2840 4
+MAX
+MAX
+MATCH CaueThirra8878
+VICTORIES AlexandreMicrosoftxna3448 33
+MAX
+DEFEATS ClrprofilerFernandes3181 18
+DEFEATS ClearhealthCaua8429 47
+RM MatheusHavaiana3596
+SORTED
+MATCH PolyhedraAnthony556
+MATCH ErpnextAntunes3387
+INTERVAL 0.16 1.51
+RM CameloRomeuejulieta4258
+INTERVAL 0.39 0.81
+MIN
+RM Spectrum5Penha4816
+DEFEATS BeatrizVoltdb81 1
+SORTED
+VICTORIES BluestacksFeijo7600 3
+VICTORIES UscCampos4418 23
+RM CaliforniaJoao1746
+INTERVAL 0.89 1.36
+GET TarantoolCecilia5424
+VICTORIES MuriloGo1849 76
+DEFEATS EnveRicardo2888 30
+DEFEATS PacocaYuri169 73
+MAX
+SORTED
+MATCH CamaraoCosta3397
+VICTORIES JsonldSilva4832 48
+MIN
+GET ParametricFrade691
+MIN
+MATCH AlvimCanadense8780
+RM AvilaGroff4113
+SORTED
+SORTED
+MATCH PearpcEinloft8762
+GET LorenzoCalifornia1997
+MIN
+VICTORIES AliceQtiplot5175 69
+INTERVAL 0.84 0.86
+DEFEATS VictorVegetariana6760 15
+VICTORIES GrepLima268 73
+MAX
+GET GabrielFreemat5442
+DEFEATS PolyhedraAnthony556 52
+SORTED
+DEFEATS BluestacksClarice6461 7
+RM LapackMatheus911
+SORTED
+MIN
+SORTED
+SORTED
+VICTORIES MirellaWindowssdk6292 65
+RM LiviaLinuxlibre6076
+INTERVAL 0.26 1.8
+SORTED
+MIN
+DEFEATS PortalNs22862 4
+VICTORIES RomeuejulietaMelissa4502 14
+MIN
+SORTED
+MAX
+RM NoronhaMetaanalyses4133
+MIN
+MATCH IdlLiz5822
+MAX
+DEFEATS ChampignonFigueiredo7432 72
+RM LeonardoQemu4923
+MATCH Githubcopilot3Marcola3731
+DEFEATS GomesScilab6077 71
+GET ElkiChloe3002
+RM TeixeiraOrcad5065
+VICTORIES HazelcastMedeiros2511 96
+MIN
+MATCH MatheusOscar7330
+GET ApacheigniteCalebe5341
+GET CamposThirra9931
+GET AltiumdesignerOtavio6129
+DEFEATS MaluGwbasic3449 77
+VICTORIES SpinnakerCerqueira3288 74
+MAX
+DEFEATS AntasSql8141 64
+MATCH SilveiraLibrepcb1475
+VICTORIES SalazarHosxp8674 74
+SORTED
+MATCH LizTexinfo8811
+VICTORIES AlanaSystemads2449 28
+GET MathcadPrado3286
+SORTED
+DEFEATS BeatrizVoltdb81 51
+MATCH MadagascarIsabelly1905
+MAX
+VICTORIES BragancaosCarneseca243 90
+GET MiguelEmtpworks2755
+INTERVAL 0.35 1.63
+GET AntasSql8141
+RM MelissaRomana6716
+MIN
+SORTED
+GET ZeprsRicardo4248
+INTERVAL 0.08 0.66
+SORTED
+INTERVAL 0.76 1.23
+INTERVAL 0.87 1.62
+DEFEATS GuedesPalmosemulator3143 11
+GET GabrielFreemat5442
+SORTED
+VICTORIES AnalyzeYuri7163 31
+DEFEATS HeloiseBash3476 69
+INTERVAL 0.26 0.8
+GET OptimjEmanuel9674
+MIN
+DEFEATS HazelcastCecilia2542 48
+VICTORIES AmaralCrazytalk3094 100
+MAX
+SORTED
+VICTORIES IdlLiz5822 77
+SORTED
+INTERVAL 0.81 0.95
+GET BashGramacho1243
+DEFEATS SarahLombinho7411 27
+MIN
+SORTED
+INTERVAL 0.36 0.57
+MAX
+INTERVAL 0.54 0.56
+DEFEATS AntasPrestigio2564 92
+DEFEATS BaudlineCosta4838 24
+GET MathematicaMalu9798
+DEFEATS GabrielFreesurfer7444 61
+GET SamuelMethod7472
+INTERVAL 0.42 1.64
+RM GuedesPalmosemulator3143
+MIN
+MAX
+MAX
+INTERVAL 0.11 0.12
+MAX
+VICTORIES EnricoRestapi4873 32
